@@ -633,7 +633,6 @@ public class ProxyToServerConnection extends ProxyConnection<HttpResponse> {
                     proxyServer.getConnectTimeout());
 
             if (localAddress != null) {
-                cb.bind(localAddress);
                 return cb.connect(remoteAddress, localAddress);
             } else {
                 return cb.connect(remoteAddress);
