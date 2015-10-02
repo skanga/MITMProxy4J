@@ -3,6 +3,7 @@ package org.littleshoot.proxy.impl;
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+
 import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.http.DefaultFullHttpResponse;
 import io.netty.handler.codec.http.DefaultHttpResponse;
@@ -13,6 +14,7 @@ import io.netty.handler.codec.http.HttpObject;
 import io.netty.handler.codec.http.HttpRequest;
 import io.netty.handler.codec.http.HttpResponse;
 import io.netty.handler.codec.http.LastHttpContent;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
@@ -21,6 +23,7 @@ import org.slf4j.LoggerFactory;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -252,8 +255,11 @@ public class ProxyUtils {
         sb.append(hostName);
         final List<String> vias;
         if (msg.headers().contains(HttpHeaders.Names.VIA)) {
-            vias = msg.headers().getAll(HttpHeaders.Names.VIA);
-            vias.add(sb.toString());
+            List<String> all = msg.headers().getAll(HttpHeaders.Names.VIA);
+            List<String> tmps = new ArrayList<String>(all.size() + 1);
+            tmps.addAll(all);
+            tmps.add(sb.toString());
+            vias = Collections.unmodifiableList(tmps);
         } else {
             vias = Collections.singletonList(sb.toString());
         }
