@@ -56,7 +56,22 @@ public abstract class BaseChainedProxyTest extends BaseProxyTest {
                 .withName("Downstream")
                 .withPort(0)
                 .withChainProxyManager(chainedProxyManager())
+                .withFiltersSource(filtersSource())
                 .plusActivityTracker(DOWNSTREAM_TRACKER).start();
+    }
+    
+    private HttpFiltersSource filtersSource() {
+        return new HttpFiltersSourceAdapter() {
+            @Override
+            public int getMaximumRequestBufferSizeInBytes() {
+                return 1024 * 1024;
+            }
+
+            @Override
+            public int getMaximumResponseBufferSizeInBytes() {
+                return 1024 * 1024;
+            }
+        };
     }
 
     protected HttpProxyServerBootstrap upstreamProxy() {
