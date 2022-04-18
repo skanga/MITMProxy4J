@@ -3,22 +3,21 @@ package org.littleshoot.proxy;
 import org.junit.Test;
 import org.littleshoot.proxy.impl.DefaultHttpProxyServer;
 
-public class StopProxyTest {
+public class StopProxyTest
+{
     @Test
-    public void testStop() {
-        HttpProxyServer proxyServer = DefaultHttpProxyServer.bootstrap()
-                .withPort(0)
-                .start();
+    public void testStop ()
+    {
+        HttpProxyServer proxyServer = DefaultHttpProxyServer.bootstrap ().withPort (0).start ();
 
-        proxyServer.stop();
+        proxyServer.stop ();
     }
 
     @Test
-    public void testAbort() {
-        HttpProxyServer proxyServer = DefaultHttpProxyServer.bootstrap()
-                .withPort(0)
-                .start();
+    public void testAbort ()
+    {
+        HttpProxyServer proxyServer = DefaultHttpProxyServer.bootstrap ().withPort (0).start ();
 
-        proxyServer.abort();
+        proxyServer.abort ();
     }
 }

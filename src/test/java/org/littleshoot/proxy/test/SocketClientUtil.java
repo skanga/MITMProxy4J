@@ -10,12 +10,13 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 /**
  * Utilities for interacting with the proxy server using sockets.
  */
-public class SocketClientUtil {
+public class SocketClientUtil
+{
     /**
      * Writes and flushes the UTF-8 encoded contents of a String to a socket.
      *
@@ -23,10 +24,11 @@ public class SocketClientUtil {
      * @param socket socket to write to
      * @throws IOException
      */
-    public static void writeStringToSocket(String string, Socket socket) throws IOException {
-        OutputStream out = socket.getOutputStream();
-        out.write(string.getBytes(Charset.forName("UTF-8")));
-        out.flush();
+    public static void writeStringToSocket (String string, Socket socket) throws IOException
+    {
+        OutputStream out = socket.getOutputStream ();
+        out.write (string.getBytes (StandardCharsets.UTF_8));
+        out.flush ();
     }
 
     /**
@@ -37,17 +39,17 @@ public class SocketClientUtil {
      * @return String containing the contents of whatever was read from the socket
      * @throws EOFException if the socket has been closed
      */
-    public static String readStringFromSocket(Socket socket) throws IOException {
-        InputStream in = socket.getInputStream();
+    public static String readStringFromSocket (Socket socket) throws IOException
+    {
+        InputStream in = socket.getInputStream ();
         byte[] bytes = new byte[10000];
-        int bytesRead = in.read(bytes);
-        if (bytesRead == -1) {
-            throw new EOFException("Unable to read from socket. The socket is closed.");
+        int bytesRead = in.read (bytes);
+        if (bytesRead == -1)
+        {
+            throw new EOFException ("Unable to read from socket. The socket is closed.");
         }
 
-        String read = new String(bytes, 0, bytesRead, Charset.forName("UTF-8"));
-
-        return read;
+        return new String (bytes, 0, bytesRead, StandardCharsets.UTF_8);
     }
 
     /**
@@ -58,14 +60,18 @@ public class SocketClientUtil {
      * @return true if the socket is open and can be written to, otherwise false
      * @throws IOException
      */
-    public static boolean isSocketReadyToWrite(Socket socket) throws IOException {
-        OutputStream out = socket.getOutputStream();
-        try {
-            out.write(0);
-            out.flush();
-            out.write(0);
-            out.flush();
-        } catch (SocketException e) {
+    public static boolean isSocketReadyToWrite (Socket socket) throws IOException
+    {
+        OutputStream out = socket.getOutputStream ();
+        try
+        {
+            out.write (0);
+            out.flush ();
+            out.write (0);
+            out.flush ();
+        }
+        catch (SocketException e)
+        {
             return false;
         }
 
@@ -81,17 +87,23 @@ public class SocketClientUtil {
      * @return true if the socket is open and can be read from, otherwise false
      * @throws IOException
      */
-    public static boolean isSocketReadyToRead(Socket socket) throws IOException {
-        InputStream in = socket.getInputStream();
-        try {
-            int readByte = in.read();
+    public static boolean isSocketReadyToRead (Socket socket) throws IOException
+    {
+        InputStream in = socket.getInputStream ();
+        try
+        {
+            int readByte = in.read ();
 
             // we just lost that byte but it doesn't really matter for testing purposes
             return readByte != -1;
-        } catch (SocketException e) {
+        }
+        catch (SocketException e)
+        {
             // the socket couldn't be read, perhaps because the connection was reset or some other error. it cannot be read.
-          return false;
-        } catch (SocketTimeoutException e) {
+            return false;
+        }
+        catch (SocketTimeoutException e)
+        {
             // the read timed out, which means the socket is still connected but there's no data on it
             return true;
         }
@@ -104,10 +116,11 @@ public class SocketClientUtil {
      * @return the new socket
      * @throws IOException
      */
-    public static Socket getSocketToProxyServer(HttpProxyServer proxyServer) throws IOException {
-        Socket socket = new Socket();
-        socket.connect(new InetSocketAddress("localhost", proxyServer.getListenAddress().getPort()), 1000);
-        socket.setSoTimeout(3000);
+    public static Socket getSocketToProxyServer (HttpProxyServer proxyServer) throws IOException
+    {
+        Socket socket = new Socket ();
+        socket.connect (new InetSocketAddress ("localhost", proxyServer.getListenAddress ().getPort ()), 1000);
+        socket.setSoTimeout (3000);
         return socket;
     }
 }

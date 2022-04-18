@@ -1,11 +1,10 @@
 package org.littleshoot.proxy;
 
-import java.net.InetSocketAddress;
+import org.littleshoot.proxy.impl.ClientToProxyConnection;
 
 import javax.net.ssl.SSLEngine;
 import javax.net.ssl.SSLSession;
-
-import org.littleshoot.proxy.impl.ClientToProxyConnection;
+import java.net.InetSocketAddress;
 
 /**
  * <p>
@@ -13,35 +12,33 @@ import org.littleshoot.proxy.impl.ClientToProxyConnection;
  * reported to a {@link ActivityTracker}.
  * </p>
  */
-public class FlowContext {
+public class FlowContext
+{
     private final InetSocketAddress clientAddress;
     private final SSLSession clientSslSession;
 
-    public FlowContext(ClientToProxyConnection clientConnection) {
-        super();
-        this.clientAddress = clientConnection.getClientAddress();
-        SSLEngine sslEngine = clientConnection.getSslEngine();
-        this.clientSslSession = sslEngine != null ? sslEngine.getSession()
-                : null;
+    public FlowContext (ClientToProxyConnection clientConnection)
+    {
+        super ();
+        this.clientAddress = clientConnection.getClientAddress ();
+        SSLEngine sslEngine = clientConnection.getSslEngine ();
+        this.clientSslSession = sslEngine != null ? sslEngine.getSession () : null;
     }
 
     /**
      * The address of the client.
-     * 
-     * @return
      */
-    public InetSocketAddress getClientAddress() {
+    public InetSocketAddress getClientAddress ()
+    {
         return clientAddress;
     }
 
     /**
      * If using SSL, this returns the {@link SSLSession} on the client
      * connection.
-     * 
-     * @return
      */
-    public SSLSession getClientSslSession() {
+    public SSLSession getClientSslSession ()
+    {
         return clientSslSession;
     }
-
 }

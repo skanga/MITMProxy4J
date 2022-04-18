@@ -4,12 +4,14 @@ package org.littleshoot.proxy.impl;
  * Configuration object for the proxy's thread pools. Controls the number of acceptor and worker threads in the Netty
  * {@link io.netty.channel.EventLoopGroup} used by the proxy.
  */
-public class ThreadPoolConfiguration {
+public class ThreadPoolConfiguration
+{
     private int acceptorThreads = ServerGroup.DEFAULT_INCOMING_ACCEPTOR_THREADS;
     private int clientToProxyWorkerThreads = ServerGroup.DEFAULT_INCOMING_WORKER_THREADS;
     private int proxyToServerWorkerThreads = ServerGroup.DEFAULT_OUTGOING_WORKER_THREADS;
 
-    public int getClientToProxyWorkerThreads() {
+    public int getClientToProxyWorkerThreads ()
+    {
         return clientToProxyWorkerThreads;
     }
 
@@ -20,12 +22,14 @@ public class ThreadPoolConfiguration {
      * @param clientToProxyWorkerThreads number of client-to-proxy worker threads to create
      * @return this thread pool configuration instance, for chaining
      */
-    public ThreadPoolConfiguration withClientToProxyWorkerThreads(int clientToProxyWorkerThreads) {
+    public ThreadPoolConfiguration withClientToProxyWorkerThreads (int clientToProxyWorkerThreads)
+    {
         this.clientToProxyWorkerThreads = clientToProxyWorkerThreads;
         return this;
     }
 
-    public int getAcceptorThreads() {
+    public int getAcceptorThreads ()
+    {
         return acceptorThreads;
     }
 
@@ -37,12 +41,14 @@ public class ThreadPoolConfiguration {
      * @param acceptorThreads number of acceptor threads to create
      * @return this thread pool configuration instance, for chaining
      */
-    public ThreadPoolConfiguration withAcceptorThreads(int acceptorThreads) {
+    public ThreadPoolConfiguration withAcceptorThreads (int acceptorThreads)
+    {
         this.acceptorThreads = acceptorThreads;
         return this;
     }
 
-    public int getProxyToServerWorkerThreads() {
+    public int getProxyToServerWorkerThreads ()
+    {
         return proxyToServerWorkerThreads;
     }
 
@@ -54,9 +60,9 @@ public class ThreadPoolConfiguration {
      * @param proxyToServerWorkerThreads number of proxy-to-server worker threads to create
      * @return this thread pool configuration instance, for chaining
      */
-    public ThreadPoolConfiguration withProxyToServerWorkerThreads(int proxyToServerWorkerThreads) {
+    public ThreadPoolConfiguration withProxyToServerWorkerThreads (int proxyToServerWorkerThreads)
+    {
         this.proxyToServerWorkerThreads = proxyToServerWorkerThreads;
         return this;
     }
-
 }

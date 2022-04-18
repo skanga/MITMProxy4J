@@ -21,8 +21,9 @@ import java.util.concurrent.atomic.AtomicInteger;
  * ServerGroup using {@link #registerProxyServer(HttpProxyServer)}, and when they shut down, must unregister with the
  * ServerGroup using {@link #unregisterProxyServer(HttpProxyServer, boolean)}.
  */
-public class ServerGroup {
-    private static final Logger log = LoggerFactory.getLogger(ServerGroup.class);
+public class ServerGroup
+{
+    private static final Logger log = LoggerFactory.getLogger (ServerGroup.class);
 
     /**
      * The default number of threads to accept incoming requests from clients. (Requests are serviced by worker threads,
@@ -43,7 +44,7 @@ public class ServerGroup {
     /**
      * Global counter for the {@link #serverGroupId}.
      */
-    private static final AtomicInteger serverGroupCount = new AtomicInteger(0);
+    private static final AtomicInteger serverGroupCount = new AtomicInteger (0);
 
     /**
      * A name for this ServerGroup to use in naming threads.
@@ -53,7 +54,7 @@ public class ServerGroup {
     /**
      * The ID of this server group. Forms part of the name of each thread created for this server group. Useful for
      * differentiating threads when multiple proxy instances are running.
-      */
+     */
     private final int serverGroupId;
 
     private final int incomingAcceptorThreads;
@@ -64,49 +65,55 @@ public class ServerGroup {
      * List of all servers registered to use this ServerGroup. Any access to this list should be synchronized using the
      * {@link #SERVER_REGISTRATION_LOCK}.
      */
-    public final List<HttpProxyServer> registeredServers = new ArrayList<HttpProxyServer>(1);
+    public final List <HttpProxyServer> registeredServers = new ArrayList <> (1);
 
     /**
      * A mapping of {@link TransportProtocol}s to their initialized {@link ProxyThreadPools}. Each transport uses a
      * different thread pool, since the initialization parameters are different.
      */
-    private final EnumMap<TransportProtocol, ProxyThreadPools> protocolThreadPools = new EnumMap<TransportProtocol, ProxyThreadPools>(TransportProtocol.class);
+    private final EnumMap <TransportProtocol, ProxyThreadPools> protocolThreadPools = new EnumMap <> (TransportProtocol.class);
 
     /**
      * A mapping of selector providers to transport protocols. Avoids special-casing each transport protocol during
      * transport protocol initialization.
      */
-    private static final EnumMap<TransportProtocol, SelectorProvider> TRANSPORT_PROTOCOL_SELECTOR_PROVIDERS = new EnumMap<TransportProtocol, SelectorProvider>(TransportProtocol.class);
-    static {
-        TRANSPORT_PROTOCOL_SELECTOR_PROVIDERS.put(TransportProtocol.TCP, SelectorProvider.provider());
+    private static final EnumMap <TransportProtocol, SelectorProvider> TRANSPORT_PROTOCOL_SELECTOR_PROVIDERS = new EnumMap <> (TransportProtocol.class);
+
+    static
+    {
+        TRANSPORT_PROTOCOL_SELECTOR_PROVIDERS.put (TransportProtocol.TCP, SelectorProvider.provider ());
 
         // allow the proxy to operate without UDT support. this allows clients that do not use UDT to exclude the barchart
         // dependency completely.
-        if (ProxyUtils.isUdtAvailable()) {
-            TRANSPORT_PROTOCOL_SELECTOR_PROVIDERS.put(TransportProtocol.UDT, NioUdtProvider.BYTE_PROVIDER);
-        } else {
-            log.debug("UDT provider not found on classpath. UDT transport will not be available.");
+        if (ProxyUtils.isUdtAvailable ())
+        {
+            TRANSPORT_PROTOCOL_SELECTOR_PROVIDERS.put (TransportProtocol.UDT, NioUdtProvider.BYTE_PROVIDER);
+        }
+        else
+        {
+            log.debug ("UDT provider not found on classpath. UDT transport will not be available.");
         }
     }
 
     /**
      * True when this ServerGroup is stopped.
      */
-    private final AtomicBoolean stopped = new AtomicBoolean(false);
+    private final AtomicBoolean stopped = new AtomicBoolean (false);
 
     /**
      * Creates a new ServerGroup instance for a proxy. Threads created for this ServerGroup will have the specified
      * ServerGroup name in the Thread name. This constructor does not actually initialize any thread pools; instead,
      * thread pools for specific transport protocols are lazily initialized as needed.
      *
-     * @param name ServerGroup name to include in thread names
+     * @param name                    ServerGroup name to include in thread names
      * @param incomingAcceptorThreads number of acceptor threads per protocol
-     * @param incomingWorkerThreads number of client-to-proxy worker threads per protocol
-     * @param outgoingWorkerThreads number of proxy-to-server worker threads per protocol
+     * @param incomingWorkerThreads   number of client-to-proxy worker threads per protocol
+     * @param outgoingWorkerThreads   number of proxy-to-server worker threads per protocol
      */
-    public ServerGroup(String name, int incomingAcceptorThreads, int incomingWorkerThreads, int outgoingWorkerThreads) {
+    public ServerGroup (String name, int incomingAcceptorThreads, int incomingWorkerThreads, int outgoingWorkerThreads)
+    {
         this.name = name;
-        this.serverGroupId = serverGroupCount.getAndIncrement();
+        this.serverGroupId = serverGroupCount.getAndIncrement ();
         this.incomingAcceptorThreads = incomingAcceptorThreads;
         this.incomingWorkerThreads = incomingWorkerThreads;
         this.outgoingWorkerThreads = outgoingWorkerThreads;
@@ -115,7 +122,7 @@ public class ServerGroup {
     /**
      * Lock for initializing any transport protocols.
      */
-    private final Object THREAD_POOL_INIT_LOCK = new Object();
+    private final Object THREAD_POOL_INIT_LOCK = new Object ();
 
     /**
      * Retrieves the {@link ProxyThreadPools} for the specified transport protocol. Lazily initializes the thread pools
@@ -128,38 +135,37 @@ public class ServerGroup {
      * @param protocol transport protocol to retrieve thread pools for
      * @return thread pools for the specified transport protocol
      */
-    private ProxyThreadPools getThreadPoolsForProtocol(TransportProtocol protocol) {
+    private ProxyThreadPools getThreadPoolsForProtocol (TransportProtocol protocol)
+    {
         // if the thread pools have not been initialized for this protocol, initialize them
-        if (protocolThreadPools.get(protocol) == null) {
-            synchronized (THREAD_POOL_INIT_LOCK) {
-                if (protocolThreadPools.get(protocol) == null) {
-                    log.debug("Initializing thread pools for {} with {} acceptor threads, {} incoming worker threads, and {} outgoing worker threads",
-                            protocol, incomingAcceptorThreads, incomingWorkerThreads, outgoingWorkerThreads);
+        if (protocolThreadPools.get (protocol) == null)
+        {
+            synchronized (THREAD_POOL_INIT_LOCK)
+            {
+                if (protocolThreadPools.get (protocol) == null)
+                {
+                    log.debug ("Initializing thread pools for {} with {} acceptor threads, {} incoming worker threads, and {} outgoing worker threads", protocol, incomingAcceptorThreads, incomingWorkerThreads, outgoingWorkerThreads);
 
-                    SelectorProvider selectorProvider = TRANSPORT_PROTOCOL_SELECTOR_PROVIDERS.get(protocol);
-                    if (selectorProvider == null) {
-                        throw new UnknownTransportProtocolException(protocol);
+                    SelectorProvider selectorProvider = TRANSPORT_PROTOCOL_SELECTOR_PROVIDERS.get (protocol);
+                    if (selectorProvider == null)
+                    {
+                        throw new UnknownTransportProtocolException (protocol);
                     }
 
-                    ProxyThreadPools threadPools = new ProxyThreadPools(selectorProvider,
-                            incomingAcceptorThreads,
-                            incomingWorkerThreads,
-                            outgoingWorkerThreads,
-                            name,
-                            serverGroupId);
-                    protocolThreadPools.put(protocol, threadPools);
+                    ProxyThreadPools threadPools = new ProxyThreadPools (selectorProvider, incomingAcceptorThreads, incomingWorkerThreads, outgoingWorkerThreads, name, serverGroupId);
+                    protocolThreadPools.put (protocol, threadPools);
                 }
             }
         }
 
-        return protocolThreadPools.get(protocol);
+        return protocolThreadPools.get (protocol);
     }
 
     /**
      * Lock controlling access to the {@link #registerProxyServer(HttpProxyServer)} and {@link #unregisterProxyServer(HttpProxyServer, boolean)}
      * methods.
      */
-    private final Object SERVER_REGISTRATION_LOCK = new Object();
+    private final Object SERVER_REGISTRATION_LOCK = new Object ();
 
     /**
      * Registers the specified proxy server as a consumer of this server group. The server group will not be shut down
@@ -167,9 +173,11 @@ public class ServerGroup {
      *
      * @param proxyServer proxy server instance to register
      */
-    public void registerProxyServer(HttpProxyServer proxyServer) {
-        synchronized (SERVER_REGISTRATION_LOCK) {
-            registeredServers.add(proxyServer);
+    public void registerProxyServer (HttpProxyServer proxyServer)
+    {
+        synchronized (SERVER_REGISTRATION_LOCK)
+        {
+            registeredServers.add (proxyServer);
         }
     }
 
@@ -178,21 +186,27 @@ public class ServerGroup {
      * server group will be shut down.
      *
      * @param proxyServer proxy server instance to unregister
-     * @param graceful when true, the server group shutdown (if necessary) will be graceful
+     * @param graceful    when true, the server group shutdown (if necessary) will be graceful
      */
-    public void unregisterProxyServer(HttpProxyServer proxyServer, boolean graceful) {
-        synchronized (SERVER_REGISTRATION_LOCK) {
-            boolean wasRegistered = registeredServers.remove(proxyServer);
-            if (!wasRegistered) {
-                log.warn("Attempted to unregister proxy server from ServerGroup that it was not registered with. Was the proxy unregistered twice?");
+    public void unregisterProxyServer (HttpProxyServer proxyServer, boolean graceful)
+    {
+        synchronized (SERVER_REGISTRATION_LOCK)
+        {
+            boolean wasRegistered = registeredServers.remove (proxyServer);
+            if (!wasRegistered)
+            {
+                log.warn ("Attempted to unregister proxy server from ServerGroup that it was not registered with. Was the proxy unregistered twice?");
             }
 
-            if (registeredServers.isEmpty()) {
-                log.debug("Proxy server unregistered from ServerGroup. No proxy servers remain registered, so shutting down ServerGroup.");
+            if (registeredServers.isEmpty ())
+            {
+                log.debug ("Proxy server unregistered from ServerGroup. No proxy servers remain registered, so shutting down ServerGroup.");
 
-                shutdown(graceful);
-            } else {
-                log.debug("Proxy server unregistered from ServerGroup. Not shutting down ServerGroup ({} proxy servers remain registered).", registeredServers.size());
+                shutdown (graceful);
+            }
+            else
+            {
+                log.debug ("Proxy server unregistered from ServerGroup. Not shutting down ServerGroup ({} proxy servers remain registered).", registeredServers.size ());
             }
         }
     }
@@ -202,44 +216,56 @@ public class ServerGroup {
      *
      * @param graceful when true, event loops will "gracefully" terminate, waiting for submitted tasks to finish
      */
-    private void shutdown(boolean graceful) {
-        if (!stopped.compareAndSet(false, true)) {
-            log.info("Shutdown requested, but ServerGroup is already stopped. Doing nothing.");
+    private void shutdown (boolean graceful)
+    {
+        if (!stopped.compareAndSet (false, true))
+        {
+            log.info ("Shutdown requested, but ServerGroup is already stopped. Doing nothing.");
 
             return;
         }
 
-        log.info("Shutting down server group event loops " + (graceful ? "(graceful)" : "(non-graceful)"));
+        log.info ("Shutting down server group event loops " + (graceful ? "(graceful)" : "(non-graceful)"));
 
         // loop through all event loops managed by this server group. this includes acceptor and worker event loops
         // for both TCP and UDP transport protocols.
-        List<EventLoopGroup> allEventLoopGroups = new ArrayList<EventLoopGroup>();
+        List <EventLoopGroup> allEventLoopGroups = new ArrayList <> ();
 
-        for (ProxyThreadPools threadPools : protocolThreadPools.values()) {
-            allEventLoopGroups.addAll(threadPools.getAllEventLoops());
+        for (ProxyThreadPools threadPools : protocolThreadPools.values ())
+        {
+            allEventLoopGroups.addAll (threadPools.getAllEventLoops ());
         }
 
-        for (EventLoopGroup group : allEventLoopGroups) {
-            if (graceful) {
-                group.shutdownGracefully();
-            } else {
-                group.shutdownGracefully(0, 0, TimeUnit.SECONDS);
+        for (EventLoopGroup group : allEventLoopGroups)
+        {
+            if (graceful)
+            {
+                group.shutdownGracefully ();
+            }
+            else
+            {
+                group.shutdownGracefully (0, 0, TimeUnit.SECONDS);
             }
         }
 
-        if (graceful) {
-            for (EventLoopGroup group : allEventLoopGroups) {
-                try {
-                    group.awaitTermination(60, TimeUnit.SECONDS);
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
+        if (graceful)
+        {
+            for (EventLoopGroup group : allEventLoopGroups)
+            {
+                try
+                {
+                    group.awaitTermination (60, TimeUnit.SECONDS);
+                }
+                catch (InterruptedException e)
+                {
+                    Thread.currentThread ().interrupt ();
 
-                    log.warn("Interrupted while shutting down event loop");
+                    log.warn ("Interrupted while shutting down event loop");
                 }
             }
         }
 
-        log.debug("Done shutting down server group");
+        log.debug ("Done shutting down server group");
     }
 
     /**
@@ -251,8 +277,9 @@ public class ServerGroup {
      * @param protocol transport protocol to retrieve the thread pool for
      * @return the client-to-proxy acceptor thread pool
      */
-    public EventLoopGroup getClientToProxyAcceptorPoolForTransport(TransportProtocol protocol) {
-        return getThreadPoolsForProtocol(protocol).getClientToProxyAcceptorPool();
+    public EventLoopGroup getClientToProxyAcceptorPoolForTransport (TransportProtocol protocol)
+    {
+        return getThreadPoolsForProtocol (protocol).getClientToProxyAcceptorPool ();
     }
 
     /**
@@ -264,8 +291,9 @@ public class ServerGroup {
      * @param protocol transport protocol to retrieve the thread pool for
      * @return the client-to-proxy worker thread pool
      */
-    public EventLoopGroup getClientToProxyWorkerPoolForTransport(TransportProtocol protocol) {
-        return getThreadPoolsForProtocol(protocol).getClientToProxyWorkerPool();
+    public EventLoopGroup getClientToProxyWorkerPoolForTransport (TransportProtocol protocol)
+    {
+        return getThreadPoolsForProtocol (protocol).getClientToProxyWorkerPool ();
     }
 
     /**
@@ -277,15 +305,16 @@ public class ServerGroup {
      * @param protocol transport protocol to retrieve the thread pool for
      * @return the proxy-to-server worker thread pool
      */
-    public EventLoopGroup getProxyToServerWorkerPoolForTransport(TransportProtocol protocol) {
-        return getThreadPoolsForProtocol(protocol).getProxyToServerWorkerPool();
+    public EventLoopGroup getProxyToServerWorkerPoolForTransport (TransportProtocol protocol)
+    {
+        return getThreadPoolsForProtocol (protocol).getProxyToServerWorkerPool ();
     }
 
     /**
      * @return true if this ServerGroup has already been stopped
      */
-    public boolean isStopped() {
-        return stopped.get();
+    public boolean isStopped ()
+    {
+        return stopped.get ();
     }
-
 }

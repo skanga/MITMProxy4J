@@ -1,24 +1,29 @@
 package org.littleshoot.proxy;
 
-import static org.littleshoot.proxy.TransportProtocol.*;
+import static org.littleshoot.proxy.TransportProtocol.TCP;
 
-public class UnencryptedTCPChainedProxyTest extends BaseChainedProxyTest {
+public class UnencryptedTCPChainedProxyTest extends BaseChainedProxyTest
+{
     @Override
-    protected HttpProxyServerBootstrap upstreamProxy() {
-        return super.upstreamProxy()
-                .withTransportProtocol(TCP);
+    protected HttpProxyServerBootstrap upstreamProxy ()
+    {
+        return super.upstreamProxy ().withTransportProtocol (TCP);
     }
 
     @Override
-    protected ChainedProxy newChainedProxy() {
-        return new BaseChainedProxy() {
+    protected ChainedProxy newChainedProxy ()
+    {
+        return new BaseChainedProxy ()
+        {
             @Override
-            public TransportProtocol getTransportProtocol() {
+            public TransportProtocol getTransportProtocol ()
+            {
                 return TransportProtocol.TCP;
             }
 
             @Override
-            public boolean requiresEncryption() {
+            public boolean requiresEncryption ()
+            {
                 return false;
             }
         };

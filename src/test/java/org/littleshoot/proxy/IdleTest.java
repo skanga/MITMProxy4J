@@ -1,17 +1,17 @@
 package org.littleshoot.proxy;
 
-import java.net.InetSocketAddress;
-import java.net.Proxy;
-import java.net.URL;
-
 import org.eclipse.jetty.server.Server;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.littleshoot.proxy.impl.DefaultHttpProxyServer;
 
+import java.net.InetSocketAddress;
+import java.net.Proxy;
+import java.net.URL;
+
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.lessThan;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assume.assumeFalse;
 import static org.junit.Assume.assumeTrue;
 
@@ -19,7 +19,8 @@ import static org.junit.Assume.assumeTrue;
  * Note - this test only works on UNIX systems because it checks file descriptor
  * counts.
  */
-public class IdleTest {
+public class IdleTest
+{
     private static final int NUMBER_OF_CONNECTIONS_TO_OPEN = 2000;
 
     private Server webServer;

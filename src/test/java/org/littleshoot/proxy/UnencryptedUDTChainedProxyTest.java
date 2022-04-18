@@ -1,24 +1,29 @@
 package org.littleshoot.proxy;
 
-import static org.littleshoot.proxy.TransportProtocol.*;
+import static org.littleshoot.proxy.TransportProtocol.UDT;
 
-public class UnencryptedUDTChainedProxyTest extends BaseChainedProxyTest {
+public class UnencryptedUDTChainedProxyTest extends BaseChainedProxyTest
+{
     @Override
-    protected HttpProxyServerBootstrap upstreamProxy() {
-        return super.upstreamProxy()
-                .withTransportProtocol(UDT);
+    protected HttpProxyServerBootstrap upstreamProxy ()
+    {
+        return super.upstreamProxy ().withTransportProtocol (UDT);
     }
 
     @Override
-    protected ChainedProxy newChainedProxy() {
-        return new BaseChainedProxy() {
+    protected ChainedProxy newChainedProxy ()
+    {
+        return new BaseChainedProxy ()
+        {
             @Override
-            public TransportProtocol getTransportProtocol() {
+            public TransportProtocol getTransportProtocol ()
+            {
                 return TransportProtocol.UDT;
             }
 
             @Override
-            public boolean requiresEncryption() {
+            public boolean requiresEncryption ()
+            {
                 return false;
             }
         };

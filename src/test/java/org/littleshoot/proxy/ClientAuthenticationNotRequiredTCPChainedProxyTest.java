@@ -1,47 +1,48 @@
 package org.littleshoot.proxy;
 
-import static org.littleshoot.proxy.TransportProtocol.*;
+import org.littleshoot.proxy.extras.SelfSignedSslEngineSource;
 
 import javax.net.ssl.SSLEngine;
 
-import org.littleshoot.proxy.extras.SelfSignedSslEngineSource;
+import static org.littleshoot.proxy.TransportProtocol.TCP;
 
 /**
  * Tests that when client authentication is not required, it doesn't matter what
  * certs the client sends.
  */
-public class ClientAuthenticationNotRequiredTCPChainedProxyTest extends
-        BaseChainedProxyTest {
-    private final SslEngineSource serverSslEngineSource = new SelfSignedSslEngineSource(
-            "chain_proxy_keystore_1.jks");
+public class ClientAuthenticationNotRequiredTCPChainedProxyTest extends BaseChainedProxyTest
+{
+    private final SslEngineSource serverSslEngineSource = new SelfSignedSslEngineSource ("chain_proxy_keystore_1.jks");
 
-    private final SslEngineSource clientSslEngineSource = new SelfSignedSslEngineSource(
-            "chain_proxy_keystore_1.jks", false, false);
+    private final SslEngineSource clientSslEngineSource = new SelfSignedSslEngineSource ("chain_proxy_keystore_1.jks", false, false);
 
     @Override
-    protected HttpProxyServerBootstrap upstreamProxy() {
-        return super.upstreamProxy()
-                .withTransportProtocol(TCP)
-                .withSslEngineSource(serverSslEngineSource)
-                .withAuthenticateSslClients(false);
+    protected HttpProxyServerBootstrap upstreamProxy ()
+    {
+        return super.upstreamProxy ().withTransportProtocol (TCP).withSslEngineSource (serverSslEngineSource).withAuthenticateSslClients (false);
     }
 
     @Override
-    protected ChainedProxy newChainedProxy() {
-        return new BaseChainedProxy() {
+    protected ChainedProxy newChainedProxy ()
+    {
+        return new BaseChainedProxy ()
+        {
             @Override
-            public TransportProtocol getTransportProtocol() {
+            public TransportProtocol getTransportProtocol ()
+            {
                 return TransportProtocol.TCP;
             }
 
             @Override
-            public boolean requiresEncryption() {
+            public boolean requiresEncryption ()
+            {
                 return true;
             }
 
             @Override
-            public SSLEngine newSslEngine() {
-                return clientSslEngineSource.newSslEngine();
+            public SSLEngine newSslEngine ()
+            {
+                return clientSslEngineSource.newSslEngine ();
             }
         };
     }

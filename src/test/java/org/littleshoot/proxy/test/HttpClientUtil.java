@@ -12,50 +12,52 @@ import org.apache.http.util.EntityUtils;
 import org.littleshoot.proxy.HttpProxyServer;
 
 import java.io.IOException;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 /**
  * Utility methods for creating HTTP clients and sending requests to servers via a LittleProxy instance.
  */
-public class HttpClientUtil {
+public class HttpClientUtil
+{
     /**
      * Creates a new HTTP client that uses the specified LittleProxy instance to perform a GET to the specified URL.
      * The HTTP client is closed and discarded after the request is completed.
      *
-     * @param url URL to post to
+     * @param url         URL to post to
      * @param proxyServer LittleProxy instance through which the GET will be proxied
      * @return the HttpResponse object encapsulating the response from the server
      */
-    public static org.apache.http.HttpResponse performHttpGet(String url, HttpProxyServer proxyServer) {
-        CloseableHttpClient http = buildHttpClient(proxyServer);
-
-        HttpGet get = new HttpGet(url);
-
-        return performHttpRequest(http, get);
+    public static org.apache.http.HttpResponse performHttpGet (String url, HttpProxyServer proxyServer)
+    {
+        CloseableHttpClient http = buildHttpClient (proxyServer);
+        HttpGet get = new HttpGet (url);
+        return performHttpRequest (http, get);
     }
 
     /**
-     * Creates a new HTTP client that uses the specified LittleProxy instance to perform a POST of the specified size to
+     * Creates a new HTTP client that uses the specified LittleProxy instance to perform a POST of the specified size
      * to the URL. The POST body will consist of a meaningless UTF-8-encoded String (currently, the letter 'q'). The
      * HTTP client is closed and discarded after the request is completed.
      *
-     * @param url URL to post to
+     * @param url             URL to post to
      * @param postSizeInBytes size of the POST body
-     * @param proxyServer LittleProxy instance through which the POST will be proxied
+     * @param proxyServer     LittleProxy instance through which the POST will be proxied
      * @return the HttpResponse from the server
      */
-    public static org.apache.http.HttpResponse performHttpPost(String url, int postSizeInBytes, HttpProxyServer proxyServer) {
-        CloseableHttpClient httpClient = buildHttpClient(proxyServer);
+    public static org.apache.http.HttpResponse performHttpPost (String url, int postSizeInBytes, HttpProxyServer proxyServer)
+    {
+        CloseableHttpClient httpClient = buildHttpClient (proxyServer);
 
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < postSizeInBytes; i++) {
-            sb.append('q');
+        StringBuilder sb = new StringBuilder ();
+        for (int i = 0; i < postSizeInBytes; i++)
+        {
+            sb.append ('q');
         }
 
-        HttpPost post = new HttpPost(url);
-        post.setEntity(new StringEntity(sb.toString(), Charset.forName("UTF-8")));
+        HttpPost post = new HttpPost (url);
+        post.setEntity (new StringEntity (sb.toString (), StandardCharsets.UTF_8));
 
-        return performHttpRequest(httpClient, post);
+        return performHttpRequest (httpClient, post);
     }
 
     /**
@@ -64,12 +66,9 @@ public class HttpClientUtil {
      * @param proxyServer LittleProxy instance through which requests will be proxied
      * @return new HttpClient
      */
-    private static CloseableHttpClient buildHttpClient(HttpProxyServer proxyServer) {
-        CloseableHttpClient httpClient = HttpClients.custom()
-                .setProxy(new HttpHost("127.0.0.1", proxyServer.getListenAddress().getPort()))
-                .build();
-
-        return httpClient;
+    private static CloseableHttpClient buildHttpClient (HttpProxyServer proxyServer)
+    {
+        return HttpClients.custom ().setProxy (new HttpHost ("127.0.0.1", proxyServer.getListenAddress ().getPort ())).build ();
     }
 
     /**
@@ -77,21 +76,25 @@ public class HttpClientUtil {
      * after the request has been made.
      *
      * @param httpClient HTTP client to use
-     * @param request HTTP request to perform
+     * @param request    HTTP request to perform
      * @return the HttpResponse from the server
      */
-    private static org.apache.http.HttpResponse performHttpRequest(CloseableHttpClient httpClient, HttpUriRequest request) {
-        try {
-            org.apache.http.HttpResponse hr = httpClient.execute(request);
-            HttpEntity responseEntity = hr.getEntity();
-            EntityUtils.consume(responseEntity);
+    private static org.apache.http.HttpResponse performHttpRequest (CloseableHttpClient httpClient, HttpUriRequest request)
+    {
+        try
+        {
+            org.apache.http.HttpResponse hr = httpClient.execute (request);
+            HttpEntity responseEntity = hr.getEntity ();
+            EntityUtils.consume (responseEntity);
 
-            httpClient.close();
+            httpClient.close ();
 
             return hr;
-        } catch (IOException e) {
+        }
+        catch (IOException e)
+        {
             // this is test code; just let all exceptions bubble up the stack, which will cause the test to fail
-            throw new RuntimeException("Unable to perform HTTP request", e);
+            throw new RuntimeException ("Unable to perform HTTP request", e);
         }
     }
 }

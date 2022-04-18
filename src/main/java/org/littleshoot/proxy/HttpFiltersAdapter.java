@@ -10,92 +10,109 @@ import java.net.InetSocketAddress;
 /**
  * Convenience base class for implementations of {@link HttpFilters}.
  */
-public class HttpFiltersAdapter implements HttpFilters {
+public class HttpFiltersAdapter implements HttpFilters
+{
     protected final HttpRequest originalRequest;
     protected final ChannelHandlerContext ctx;
 
-    public HttpFiltersAdapter(HttpRequest originalRequest,
-            ChannelHandlerContext ctx) {
+    public HttpFiltersAdapter (HttpRequest originalRequest, ChannelHandlerContext ctx)
+    {
         this.originalRequest = originalRequest;
         this.ctx = ctx;
     }
 
-    public HttpFiltersAdapter(HttpRequest originalRequest) {
-        this(originalRequest, null);
+    public HttpFiltersAdapter (HttpRequest originalRequest)
+    {
+        this (originalRequest, null);
     }
 
     @Override
-    public HttpResponse clientToProxyRequest(HttpObject httpObject) {
+    public HttpResponse clientToProxyRequest (HttpObject httpObject)
+    {
         return null;
     }
 
     @Override
-    public HttpResponse proxyToServerRequest(HttpObject httpObject) {
+    public HttpResponse proxyToServerRequest (HttpObject httpObject)
+    {
         return null;
     }
 
     @Override
-    public void proxyToServerRequestSending() {
+    public void proxyToServerRequestSending ()
+    {
     }
 
     @Override
-    public void proxyToServerRequestSent() {
+    public void proxyToServerRequestSent ()
+    {
     }
 
     @Override
-    public HttpObject serverToProxyResponse(HttpObject httpObject) {
+    public HttpObject serverToProxyResponse (HttpObject httpObject)
+    {
         return httpObject;
     }
 
     @Override
-    public void serverToProxyResponseTimedOut() {
+    public void serverToProxyResponseTimedOut ()
+    {
     }
 
     @Override
-    public void serverToProxyResponseReceiving() {
+    public void serverToProxyResponseReceiving ()
+    {
     }
 
     @Override
-    public void serverToProxyResponseReceived() {
+    public void serverToProxyResponseReceived ()
+    {
     }
 
     @Override
-    public HttpObject proxyToClientResponse(HttpObject httpObject) {
+    public HttpObject proxyToClientResponse (HttpObject httpObject)
+    {
         return httpObject;
     }
 
     @Override
-    public void proxyToServerConnectionQueued() {
+    public void proxyToServerConnectionQueued ()
+    {
     }
 
     @Override
-    public InetSocketAddress proxyToServerResolutionStarted(
-            String resolvingServerHostAndPort) {
+    public InetSocketAddress proxyToServerResolutionStarted (String resolvingServerHostAndPort)
+    {
         return null;
     }
 
     @Override
-    public void proxyToServerResolutionFailed(String hostAndPort) {
+    public void proxyToServerResolutionFailed (String hostAndPort)
+    {
     }
 
     @Override
-    public void proxyToServerResolutionSucceeded(String serverHostAndPort,
-            InetSocketAddress resolvedRemoteAddress) {
+    public void proxyToServerResolutionSucceeded (String serverHostAndPort, InetSocketAddress resolvedRemoteAddress)
+    {
     }
 
     @Override
-    public void proxyToServerConnectionStarted() {
+    public void proxyToServerConnectionStarted ()
+    {
     }
 
     @Override
-    public void proxyToServerConnectionSSLHandshakeStarted() {
+    public void proxyToServerConnectionSSLHandshakeStarted ()
+    {
     }
 
     @Override
-    public void proxyToServerConnectionFailed() {
+    public void proxyToServerConnectionFailed ()
+    {
     }
 
     @Override
-    public void proxyToServerConnectionSucceeded(ChannelHandlerContext serverCtx) {
+    public void proxyToServerConnectionSucceeded (ChannelHandlerContext serverCtx)
+    {
     }
 }

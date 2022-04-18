@@ -5,11 +5,11 @@ import java.net.InetSocketAddress;
 /**
  * Interface for the top-level proxy server class.
  */
-public interface HttpProxyServer {
+public interface HttpProxyServer
+{
+    int getIdleConnectionTimeout ();
 
-    int getIdleConnectionTimeout();
-
-    void setIdleConnectionTimeout(int idleConnectionTimeout);
+    void setIdleConnectionTimeout (int idleConnectionTimeout);
 
     /**
      * <p>
@@ -17,41 +17,40 @@ public interface HttpProxyServer {
      * same. If the proxy was started with port 0 (JVM-assigned port), the cloned proxy will also use a JVM-assigned
      * port.
      * </p>
-     * 
+     *
      * <p>
      * The new server will share event loops with the original server. The event
      * loops will use whatever name was given to the first server in the clone
      * group. The server group will not terminate until the original server and all clones terminate.
      * </p>
-     * 
-     * @return a bootstrap that allows customizing and starting the cloned
-     *         server
+ a bootstrap that allows customizing and starting the cloned
+     * server
      */
-    HttpProxyServerBootstrap clone();
+    HttpProxyServerBootstrap clone ();
 
     /**
      * Stops the server and all related clones. Waits for traffic to stop before shutting down.
      */
-    void stop();
+    void stop ();
 
     /**
      * Stops the server and all related clones immediately, without waiting for traffic to stop.
      */
-    void abort();
+    void abort ();
 
     /**
      * Return the address on which this proxy is listening.
-     * 
-     * @return
+
      */
-    InetSocketAddress getListenAddress();
+    InetSocketAddress getListenAddress ();
 
     /**
      * <p>
      * Set the read/write throttle bandwidths (in bytes/second) for this proxy.
      * </p>
+     *
      * @param readThrottleBytesPerSecond
      * @param writeThrottleBytesPerSecond
      */
-    void setThrottle(long readThrottleBytesPerSecond, long writeThrottleBytesPerSecond);
+    void setThrottle (long readThrottleBytesPerSecond, long writeThrottleBytesPerSecond);
 }
